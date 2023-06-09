@@ -215,8 +215,8 @@ export class FileLoadsService {
   
       return data.data;
     } catch (error) {
-      this.logger.log(`ERROR GET ${fullURL}: ${error}`);
-      return await this.get({...params});
+      this.logger.log(`ERROR GET ${fullURL}: ${error.toString()}`);
+      return await this.get(params);
     }
   }
 
@@ -234,8 +234,8 @@ export class FileLoadsService {
       );
       return data;
     } catch (error) {
-      this.logger.log(`ERROR GET ${fullURL}: ${error}`);
-      return await this.get({...params});
+      this.logger.log(`ERROR GET ${fullURL}: ${error.toString()}`);
+      return await this.post(params);
     }
   }
 
@@ -253,8 +253,8 @@ export class FileLoadsService {
       );
       return data;
     } catch (error) {
-      this.logger.log(`ERROR PATCH ${fullURL}: ${error}`);
-      return await this.get({...params});
+      this.logger.log(`ERROR PATCH ${fullURL}: ${error.toString()}`);
+      return await this.patch(params);
     }
   }
 
