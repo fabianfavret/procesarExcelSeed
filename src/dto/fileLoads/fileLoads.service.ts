@@ -91,7 +91,6 @@ export class FileLoadsService {
               } catch (error) {
                 this.logger.debug(`ERROD row----- ${params.query.langCode === 'ES' ? row['Referencia para ID'] : row['ID con idioma']}`);
                 errorConcatenatedString += `${params.query.langCode === 'ES' ? row['Referencia para ID'] : row['ID con idioma']}` + '\n';
-                continue;
               }
             }
           }
@@ -203,49 +202,60 @@ export class FileLoadsService {
 
   async get(params: { url: string; path?: any; query?: any; accessToken?: string }): Promise<any> {
     const fullURL = this.getFullURL({ baseURL: this.editorURL, url: params.url, path: params.path, query: params.query });
-
-    //this.logger.log(`GET ${fullURL}`);
-
-    const { data } = await firstValueFrom(
-      this.httpService.get<any>(fullURL, this._getAxiosConfig(params.accessToken)).pipe(
-        catchError((error: AxiosError) => {
-          this.logger.debug(error.response?.data || JSON.stringify(error));
-          throw { status: 500, message: `${FileLoadsService.name}(get):${error.message}` };
-        })
-      )
-    );
-
-    return data.data;
+    
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.get<any>(fullURL, this._getAxiosConfig(params.accessToken)).pipe(
+          catchError((error: AxiosError) => {
+            this.logger.debug(error.response?.data || JSON.stringify(error));
+            throw { status: 500, message: `${FileLoadsService.name}(get):${error.message}` };
+          })
+        )
+      );
+  
+      return data.data;
+    } catch (error) {
+      this.logger.log(`ERROR GET ${fullURL}: ${error}`);
+      return await this.get({...params});
+    }
   }
 
   async post(params: { url: string; path?: any; payload?: any; accessToken?: string }): Promise<any> {
     const fullURL = this.getFullURL({ baseURL: this.editorURL, url: params.url, path: params.path });
-    //this.logger.log(`POST ${fullURL}`);
-
-    const { data } = await firstValueFrom(
-      this.httpService.post<any>(fullURL, params.payload, this._getAxiosConfig(params.accessToken)).pipe(
-        catchError((error: AxiosError) => {
-          this.logger.debug(error.response?.data || JSON.stringify(error));
-          throw { status: 500, message: `${FileLoadsService.name}(post):${error.message}` };
-        })
-      )
-    );
-    return data;
+    
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.post<any>(fullURL, params.payload, this._getAxiosConfig(params.accessToken)).pipe(
+          catchError((error: AxiosError) => {
+            this.logger.debug(error.response?.data || JSON.stringify(error));
+            throw { status: 500, message: `${FileLoadsService.name}(post):${error.message}` };
+          })
+        )
+      );
+      return data;
+    } catch (error) {
+      this.logger.log(`ERROR GET ${fullURL}: ${error}`);
+      return await this.get({...params});
+    }
   }
 
   async patch(params: { url: string; path?: any; payload?: any; accessToken?: string }) {
     const fullURL = this.getFullURL({ baseURL: this.editorURL, url: params.url, path: params.path });
-    // this.logger.log(`patch ${fullURL}`);
-
-    const { data } = await firstValueFrom(
-      this.httpService.patch<any>(fullURL, params.payload, this._getAxiosConfig(params.accessToken)).pipe(
-        catchError((error: AxiosError) => {
-          this.logger.debug(error.response?.data || JSON.stringify(error));
-          throw { status: 500, message: `${FileLoadsService.name}(put):${error.message}` };
-        })
-      )
-    );
-    return data;
+    
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.patch<any>(fullURL, params.payload, this._getAxiosConfig(params.accessToken)).pipe(
+          catchError((error: AxiosError) => {
+            this.logger.debug(error.response?.data || JSON.stringify(error));
+            throw { status: 500, message: `${FileLoadsService.name}(put):${error.message}` };
+          })
+        )
+      );
+      return data;
+    } catch (error) {
+      this.logger.log(`ERROR PATCH ${fullURL}: ${error}`);
+      return await this.get({...params});
+    }
   }
 
   getFullURL(params: { baseURL: string; url: string; path?: any; query?: any }): string {
