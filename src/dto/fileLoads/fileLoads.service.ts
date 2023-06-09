@@ -29,9 +29,13 @@ export class FileLoadsService {
   private readonly httpService: HttpService;
 
   // private readonly editorURL = 'http://localhost:3000/api/';
-  // private readonly editorURL = 'https://editor-backoffice.tangerine-dev.oneclicklabs.es/api/';
+  // private readonly folderLog = 'local';
+  private readonly editorURL = 'https://editor-backoffice.tangerine-dev.oneclicklabs.es/api/';
+  private readonly folderLog = 'dev';
   // private readonly editorURL = 'https://editor-backoffice.tangerine-qa.oneclicklabs.es/api/';
-  private readonly editorURL = 'https://editor-backoffice.blueberrymath.ai/api/';
+  // private readonly folderLog = 'qa';
+  // private readonly editorURL = 'https://editor-backoffice.blueberrymath.ai/api/';
+  // private readonly folderLog = 'prd';
 
   async processExcelFile(params: {
     query: { educationYearGuid?: string; educationDisciplineGuid?: string; langCode: string; responsible?: string; fileName?: string };
@@ -56,9 +60,9 @@ export class FileLoadsService {
           let createdConcatenatedString = '';
           if (file.endsWith('.xlsx')) {
             const filePath = `${directoryPath}/${file}`;
-            errorOutputFilePath = `${directoryPath}/error_${file.split('.xlsx').join('.txt')}`;
-            updatedOutputFilePath = `${directoryPath}/update_${file.split('.xlsx').join('.txt')}`;
-            createdOutputFilePath = `${directoryPath}/create_${file.split('.xlsx').join('.txt')}`;
+            errorOutputFilePath = `${directoryPath}/${this.folderLog}/error_${file.split('.xlsx').join('.txt')}`;
+            updatedOutputFilePath = `${directoryPath}/${this.folderLog}/update_${file.split('.xlsx').join('.txt')}`;
+            createdOutputFilePath = `${directoryPath}/${this.folderLog}/create_${file.split('.xlsx').join('.txt')}`;
 
             const sheetName = 'Seeds';
 
@@ -66,8 +70,12 @@ export class FileLoadsService {
 
             const xmlRowObject = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]); // Lee los datos de la hoja y convierte a un arreglo de objetos
 
+            const amount = xmlRowObject.length;
+            let pointer = 1;
+
             for (const row of xmlRowObject) {
               this.logger.debug(`row----- ${params.query.langCode === 'ES' ? row['Referencia para ID'] : row['ID con idioma']}`);
+              this.logger.debug(`count ${pointer++}-${amount}`);
               try {
                 JSON.parse(row['JSON']);
                 await _continue({
